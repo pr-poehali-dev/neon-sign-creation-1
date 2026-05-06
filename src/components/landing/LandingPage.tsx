@@ -3,6 +3,7 @@ import { motion, useScroll, useSpring } from 'framer-motion'
 import Section from './Section'
 import Layout from './Layout'
 import LeadModal from './LeadModal'
+import BusinessCardCalculator from './BusinessCardCalculator'
 import { sections } from './sections'
 
 export default function LandingPage() {
@@ -11,6 +12,10 @@ export default function LandingPage() {
   const containerRef = useRef<HTMLDivElement>(null)
   const { scrollYProgress } = useScroll({ container: containerRef })
   const scaleX = useSpring(scrollYProgress, { stiffness: 100, damping: 30, restDelta: 0.001 })
+
+  // Калькулятор вставляется после секции features (index 2), итого totalSlides = sections.length + 1
+  const CALC_AFTER_INDEX = 2
+  const totalSlides = sections.length + 1
 
   useEffect(() => {
     const handleScroll = () => {
@@ -43,12 +48,19 @@ export default function LandingPage() {
     }
   }
 
+  // Строим слайды: вставляем калькулятор после CALC_AFTER_INDEX
+  const slides = sections.reduce<{ type: 'section' | 'calc'; sectionIndex?: number }[]>((acc, _, i) => {
+    acc.push({ type: 'section', sectionIndex: i })
+    if (i === CALC_AFTER_INDEX) acc.push({ type: 'calc' })
+    return acc
+  }, [])
+
   return (
     <Layout>
       <nav className="fixed top-0 right-0 h-screen flex flex-col justify-center z-30 p-4">
-        {sections.map((section, index) => (
+        {Array.from({ length: totalSlides }).map((_, index) => (
           <button
-            key={section.id}
+            key={index}
             className={`w-3 h-3 rounded-full my-2 transition-all ${
               index === activeSection ? 'bg-white scale-150' : 'bg-gray-600'
             }`}
@@ -64,14 +76,18 @@ export default function LandingPage() {
         ref={containerRef}
         className="h-full overflow-y-auto snap-y snap-mandatory"
       >
-        {sections.map((section, index) => (
-          <Section
-            key={section.id}
-            {...section}
-            isActive={index === activeSection}
-            onButtonClick={() => setModalOpen(true)}
-          />
-        ))}
+        {slides.map((slide, index) =>
+          slide.type === 'calc' ? (
+            <BusinessCardCalculator key="calc" isActive={index === activeSection} />
+          ) : (
+            <Section
+              key={sections[slide.sectionIndex!].id}
+              {...sections[slide.sectionIndex!]}
+              isActive={index === activeSection}
+              onButtonClick={() => setModalOpen(true)}
+            />
+          )
+        )}
       </div>
       <LeadModal isOpen={modalOpen} onClose={() => setModalOpen(false)} />
     </Layout>
