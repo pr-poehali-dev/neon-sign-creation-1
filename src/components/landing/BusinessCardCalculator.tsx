@@ -54,7 +54,6 @@ function getPrice(paperId: string, printId: string, qty: number): number {
   const breakpoints = PRESET_QUANTITIES
 
   if (qty <= breakpoints[0]) return table[breakpoints[0]]
-  if (qty >= breakpoints[breakpoints.length - 1]) return table[breakpoints[breakpoints.length - 1]]
 
   for (let i = 0; i < breakpoints.length - 1; i++) {
     const lo = breakpoints[i]
@@ -64,7 +63,12 @@ function getPrice(paperId: string, printId: string, qty: number): number {
       return table[lo] + t * (table[hi] - table[lo])
     }
   }
-  return table[breakpoints[breakpoints.length - 1]]
+
+  // Тираж > 1000: экстраполяция по тренду последних двух точек (900→1000)
+  const last = breakpoints[breakpoints.length - 1]
+  const prev = breakpoints[breakpoints.length - 2]
+  const slope = (table[last] - table[prev]) / (last - prev)
+  return Math.max(MIN_PRICE_PER_PIECE, table[last] + slope * (qty - last))
 }
 
 interface Props {
@@ -277,7 +281,7 @@ export default function BusinessCardCalculator({ isActive }: Props) {
               </div>
               <div className="mb-6">
                 <p className="text-zinc-500 text-sm mb-1">Цена за штуку</p>
-                <p className="text-white text-2xl font-semibold">
+                <p className="text-zinc-400 text-base">
                   {result.pricePerPiece.toFixed(2)} руб.
                 </p>
               </div>
