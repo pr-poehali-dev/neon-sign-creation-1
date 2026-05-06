@@ -5,10 +5,10 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 
 const PAPER_OPTIONS = [
-  { id: 'matte', label: 'Матовая', price: 0, lamination: true },
-  { id: 'glossy', label: 'Глянцевая', price: 0, lamination: true },
-  { id: 'linen', label: 'Лён белый', price: 2.25, lamination: false },
-  { id: 'kraft', label: 'Крафт', price: 1.4, lamination: false },
+  { id: 'matte', label: 'Матовая', lamination: true },
+  { id: 'glossy', label: 'Глянцевая', lamination: true },
+  { id: 'linen', label: 'Лён белый', lamination: false },
+  { id: 'kraft', label: 'Крафт', lamination: false },
 ]
 
 const LAMINATION_OPTIONS = [
@@ -27,37 +27,30 @@ const PRESET_QUANTITIES = [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]
 
 const MIN_PRICE_PER_PIECE = 4
 
-// Цена за штуку (без ламинации и бумаги) по тиражу
-const PRINT_PRICES: Record<string, Record<number, number>> = {
-  single: {
-    100: 10,
-    200: 8,
-    300: 7.7,
-    400: 6.51,
-    500: 6.45,
-    600: 6.41,
-    700: 6.38,
-    800: 5.31,
-    900: 5.29,
-    1000: 5.28,
+// Полные таблицы цен за штуку по бумаге и типу печати
+const PRICES: Record<string, Record<string, Record<number, number>>> = {
+  matte: {
+    single:  { 100: 10, 200: 8, 300: 7.7, 400: 6.51, 500: 6.45, 600: 6.41, 700: 6.38, 800: 5.31, 900: 5.29, 1000: 5.28 },
+    double:  { 100: 14.7, 200: 12, 300: 11.77, 400: 10.11, 500: 10.06, 600: 10.01, 700: 10, 800: 8.11, 900: 8.09, 1000: 8.07 },
   },
-  double: {
-    100: 14.7,
-    200: 12,
-    300: 11.77,
-    400: 10.11,
-    500: 10.06,
-    600: 10.01,
-    700: 10,
-    800: 8.11,
-    900: 8.09,
-    1000: 8.07,
+  glossy: {
+    single:  { 100: 10, 200: 8, 300: 7.7, 400: 6.51, 500: 6.45, 600: 6.41, 700: 6.38, 800: 5.31, 900: 5.29, 1000: 5.28 },
+    double:  { 100: 14.7, 200: 12, 300: 11.77, 400: 10.11, 500: 10.06, 600: 10.01, 700: 10, 800: 8.11, 900: 8.09, 1000: 8.07 },
+  },
+  linen: {
+    single:  { 100: 14.7, 200: 12, 300: 11.77, 400: 10.11, 500: 10.06, 600: 10.01, 700: 10, 800: 9.54, 900: 9.52, 1000: 9.51 },
+    double:  { 100: 19, 200: 16.2, 300: 16, 400: 14.34, 500: 14.28, 600: 14.24, 700: 14.21, 800: 12.84, 900: 12.32, 1000: 12.3 },
+  },
+  kraft: {
+    single:  { 100: 12.6, 200: 10.68, 300: 10.47, 400: 9.22, 500: 9.15, 600: 9.11, 700: 9.08, 800: 8.01, 900: 7.99, 1000: 7.97 },
+    double:  { 100: 17.4, 200: 14.68, 300: 14.47, 400: 12.81, 500: 12.75, 600: 12.71, 700: 12.68, 800: 10.81, 900: 10.79, 1000: 10.78 },
   },
 }
 
-// Для произвольного тиража — линейная интерполяция между ближайшими точками
-function getPrintPrice(printId: string, qty: number): number {
-  const table = PRINT_PRICES[printId]
+// Линейная интерполяция для произвольного тиража
+function getPrice(paperId: string, printId: string, qty: number): number {
+  const table = PRICES[paperId]?.[printId]
+  if (!table) return 0
   const breakpoints = PRESET_QUANTITIES
 
   if (qty <= breakpoints[0]) return table[breakpoints[0]]
@@ -94,11 +87,10 @@ export default function BusinessCardCalculator({ isActive }: Props) {
     const qty = isCustom ? (parseInt(customQty) || 0) : (quantity as number)
     if (qty <= 0) return null
 
-    const paperPrice = selectedPaper.price
     const laminationPrice = canLaminate ? (LAMINATION_OPTIONS.find(l => l.id === lamination)?.price ?? 0) : 0
-    const printPrice = getPrintPrice(print, qty) * (urgent ? 1.5 : 1)
+    const basePrice = getPrice(paper, print, qty) * (urgent ? 1.5 : 1)
 
-    let pricePerPiece = printPrice + paperPrice + laminationPrice
+    let pricePerPiece = basePrice + laminationPrice
     if (pricePerPiece < MIN_PRICE_PER_PIECE) pricePerPiece = MIN_PRICE_PER_PIECE
 
     const total = pricePerPiece * qty
@@ -166,7 +158,7 @@ export default function BusinessCardCalculator({ isActive }: Props) {
                     : 'border-zinc-700 text-zinc-400 hover:border-zinc-500'
                 }`}
               >
-                Свой
+                Свой тираж
               </button>
             </div>
             {isCustom && (
