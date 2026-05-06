@@ -177,6 +177,26 @@ export default function BusinessCardCalculator({ isActive }: Props) {
             )}
           </div>
 
+          {/* Печать */}
+          <div>
+            <Label className="text-zinc-400 text-sm mb-3 block">Печать</Label>
+            <div className="flex flex-wrap gap-2">
+              {PRINT_OPTIONS.map(p => (
+                <button
+                  key={p.id}
+                  onClick={() => setPrint(p.id)}
+                  className={`px-3 py-1.5 rounded text-sm border transition-colors ${
+                    print === p.id
+                      ? 'bg-[#FF4D00] border-[#FF4D00] text-white'
+                      : 'border-zinc-700 text-zinc-400 hover:border-zinc-500'
+                  }`}
+                >
+                  {p.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
           {/* Бумага */}
           <div>
             <Label className="text-zinc-400 text-sm mb-3 block">Бумага</Label>
@@ -190,26 +210,6 @@ export default function BusinessCardCalculator({ isActive }: Props) {
                   }}
                   className={`px-3 py-1.5 rounded text-sm border transition-colors ${
                     paper === p.id
-                      ? 'bg-[#FF4D00] border-[#FF4D00] text-white'
-                      : 'border-zinc-700 text-zinc-400 hover:border-zinc-500'
-                  }`}
-                >
-                  {p.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Печать */}
-          <div>
-            <Label className="text-zinc-400 text-sm mb-3 block">Печать</Label>
-            <div className="flex flex-wrap gap-2">
-              {PRINT_OPTIONS.map(p => (
-                <button
-                  key={p.id}
-                  onClick={() => setPrint(p.id)}
-                  className={`px-3 py-1.5 rounded text-sm border transition-colors ${
-                    print === p.id
                       ? 'bg-[#FF4D00] border-[#FF4D00] text-white'
                       : 'border-zinc-700 text-zinc-400 hover:border-zinc-500'
                   }`}
