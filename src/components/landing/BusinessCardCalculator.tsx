@@ -27,6 +27,20 @@ const PRESET_QUANTITIES = [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]
 
 const MIN_TOTAL = 1000
 
+// Наценка по тиражу:
+// 100 шт → ×16, каждые +100 шт −1, минимум ×7 до 1000 шт
+// 1000 шт → ×7, каждые +500 шт −1, минимум ×4 от 2500 шт и выше
+function getMarkup(qty: number): number {
+  if (qty <= 0) return 16
+  if (qty <= 1000) {
+    const steps = Math.floor((qty - 1) / 100) // 0 при qty=1..100, 1 при 101..200, ...
+    return Math.max(7, 16 - steps)
+  }
+  // qty > 1000
+  const steps = Math.floor((qty - 1001) / 500) + 1 // 1 при 1001..1500, 2 при 1501..2000, ...
+  return Math.max(4, 7 - steps)
+}
+
 interface Props {
   isActive: boolean
 }
@@ -51,17 +65,21 @@ export default function BusinessCardCalculator({ isActive }: Props) {
     const laminationPrice = canLaminate ? (LAMINATION_OPTIONS.find(l => l.id === lamination)?.price ?? 0) : 0
     const printPrice = PRINT_OPTIONS.find(p => p.id === print)!.price
 
-    let pricePerPiece = paperPrice + laminationPrice + printPrice
-    if (urgent) pricePerPiece *= 4
+    const markup = getMarkup(qty)
+    // Себестоимость × наценка, срочность × 4 только на печать
+    const basePrintPrice = printPrice * (urgent ? 4 : 1)
+    const pricePerPiece = (paperPrice + laminationPrice + basePrintPrice) * markup
 
     let total = pricePerPiece * qty
     if (total < MIN_TOTAL) total = MIN_TOTAL
 
+    const realPricePerPiece = total / qty
+
     return {
       qty,
-      pricePerPiece: pricePerPiece,
+      pricePerPiece: realPricePerPiece,
       total,
-      sheets: Math.ceil(qty / 21),
+      markup,
     }
   }, [quantity, customQty, isCustom, paper, lamination, print, urgent, selectedPaper, canLaminate])
 
@@ -224,7 +242,7 @@ export default function BusinessCardCalculator({ isActive }: Props) {
                     : 'border-zinc-700 text-zinc-400 hover:border-zinc-500'
                 }`}
               >
-                Срочная ×4
+                Срочная
               </button>
             </div>
           </div>
@@ -241,9 +259,7 @@ export default function BusinessCardCalculator({ isActive }: Props) {
               <div className="mb-6">
                 <p className="text-zinc-500 text-sm mb-1">Цена за штуку</p>
                 <p className="text-white text-2xl font-semibold">
-                  {result.total === MIN_TOTAL
-                    ? '—'
-                    : `${result.pricePerPiece.toFixed(2)} руб.`}
+                  {result.pricePerPiece.toFixed(2)} руб.
                 </p>
               </div>
               <div className="border-t border-zinc-800 pt-6">
