@@ -17,6 +17,11 @@ export default function Layout({ children }: LayoutProps) {
           hoverFillColor="#222"
         />
       </div>
+      <header className="absolute top-0 left-0 right-0 z-30 px-8 py-5 flex items-center">
+        <span className="text-white font-bold text-xl tracking-wide">
+          Ява <span className="text-[#FF4D00]">Дизайн</span>
+        </span>
+      </header>
       <div className="relative z-20 h-full">
         {children}
       </div>
