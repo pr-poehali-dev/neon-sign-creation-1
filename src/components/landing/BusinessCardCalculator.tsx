@@ -66,9 +66,9 @@ export default function BusinessCardCalculator({ isActive }: Props) {
     const printPrice = PRINT_OPTIONS.find(p => p.id === print)!.price
 
     const markup = getMarkup(qty)
-    // Себестоимость × наценка, срочность × 4 только на печать
+    // Наценка только на бумагу и печать, ламинация — фиксированная цена
     const basePrintPrice = printPrice * (urgent ? 4 : 1)
-    const pricePerPiece = (paperPrice + laminationPrice + basePrintPrice) * markup
+    const pricePerPiece = (paperPrice + basePrintPrice) * markup + laminationPrice
 
     let total = pricePerPiece * qty
     if (total < MIN_TOTAL) total = MIN_TOTAL
