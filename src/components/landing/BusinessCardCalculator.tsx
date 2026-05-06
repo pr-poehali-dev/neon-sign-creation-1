@@ -294,9 +294,7 @@ export default function BusinessCardCalculator({ isActive }: Props) {
                 <p className="text-[#FF4D00] text-4xl font-bold">
                   {result.total.toLocaleString('ru-RU', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} ₽
                 </p>
-                {result.total === MIN_TOTAL && (
-                  <p className="text-zinc-600 text-xs mt-1">Минимальный заказ — 1 000 ₽</p>
-                )}
+
               </div>
               <Button
                 className="mt-8 w-full bg-[#FF4D00] hover:bg-[#cc3d00] text-white border-0"
