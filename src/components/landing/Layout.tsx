@@ -1,4 +1,5 @@
 import { ReactNode } from 'react'
+import Icon from '@/components/ui/icon'
 import { Squares } from "./squares-background"
 
 interface LayoutProps {
@@ -21,12 +22,24 @@ export default function Layout({ children }: LayoutProps) {
         <span className="text-white font-bold text-xl tracking-wide">
           Ява <span className="text-[#FF4D00]">Дизайн</span>
         </span>
-        <div className="hidden md:flex items-center gap-6 text-sm text-zinc-400">
-          <a href="tel:89663386505" className="hover:text-white transition-colors">
+        <div className="hidden md:flex items-center gap-5 text-sm text-zinc-400">
+          <a href="tel:89663386505" className="hover:text-white transition-colors flex items-center gap-1.5">
+            <Icon name="Phone" size={14} />
             8 966 338-65-05
           </a>
+          <a href="https://t.me/YavaDesign" target="_blank" rel="noopener noreferrer" className="hover:text-[#2AABEE] transition-colors flex items-center gap-1.5">
+            <Icon name="Send" size={14} />
+            @YavaDesign
+          </a>
+          <a href="https://max.ru/89963386505" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors flex items-center gap-1.5">
+            <Icon name="MessageCircle" size={14} />
+            MAX
+          </a>
           <span className="text-zinc-600">|</span>
-          <span>Толбухина 13к1</span>
+          <span className="flex items-center gap-1.5">
+            <Icon name="MapPin" size={14} />
+            Толбухина 13к1
+          </span>
         </div>
       </header>
       <div className="relative z-20 h-full">
