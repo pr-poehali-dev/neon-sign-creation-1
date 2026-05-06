@@ -5,8 +5,8 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 
 const PAPER_OPTIONS = [
-  { id: 'matte', label: 'Матовая', price: 0.5, lamination: true },
-  { id: 'glossy', label: 'Глянцевая', price: 0.5, lamination: true },
+  { id: 'matte', label: 'Матовая', price: 0, lamination: true },
+  { id: 'glossy', label: 'Глянцевая', price: 0, lamination: true },
   { id: 'linen', label: 'Лён белый', price: 2.25, lamination: false },
   { id: 'kraft', label: 'Крафт', price: 1.4, lamination: false },
 ]
@@ -19,26 +19,59 @@ const LAMINATION_OPTIONS = [
 ]
 
 const PRINT_OPTIONS = [
-  { id: 'single', label: 'Односторонняя', price: 0.5 },
-  { id: 'double', label: 'Двусторонняя', price: 1.0 },
+  { id: 'single', label: 'Односторонняя' },
+  { id: 'double', label: 'Двусторонняя' },
 ]
 
 const PRESET_QUANTITIES = [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]
 
-const MIN_TOTAL = 1000
+const MIN_PRICE_PER_PIECE = 4
 
-// Наценка по тиражу:
-// 100 шт → ×16, каждые +100 шт −1, минимум ×7 до 1000 шт
-// 1000 шт → ×7, каждые +500 шт −1, минимум ×4 от 2500 шт и выше
-function getMarkup(qty: number): number {
-  if (qty <= 0) return 16
-  if (qty <= 1000) {
-    const steps = Math.floor((qty - 1) / 100) // 0 при qty=1..100, 1 при 101..200, ...
-    return Math.max(7, 16 - steps)
+// Цена за штуку (без ламинации и бумаги) по тиражу
+const PRINT_PRICES: Record<string, Record<number, number>> = {
+  single: {
+    100: 10,
+    200: 8,
+    300: 7.7,
+    400: 6.51,
+    500: 6.45,
+    600: 6.41,
+    700: 6.38,
+    800: 5.31,
+    900: 5.29,
+    1000: 5.28,
+  },
+  double: {
+    100: 14.7,
+    200: 12,
+    300: 11.77,
+    400: 10.11,
+    500: 10.06,
+    600: 10.01,
+    700: 10,
+    800: 8.11,
+    900: 8.09,
+    1000: 8.07,
+  },
+}
+
+// Для произвольного тиража — линейная интерполяция между ближайшими точками
+function getPrintPrice(printId: string, qty: number): number {
+  const table = PRINT_PRICES[printId]
+  const breakpoints = PRESET_QUANTITIES
+
+  if (qty <= breakpoints[0]) return table[breakpoints[0]]
+  if (qty >= breakpoints[breakpoints.length - 1]) return table[breakpoints[breakpoints.length - 1]]
+
+  for (let i = 0; i < breakpoints.length - 1; i++) {
+    const lo = breakpoints[i]
+    const hi = breakpoints[i + 1]
+    if (qty >= lo && qty <= hi) {
+      const t = (qty - lo) / (hi - lo)
+      return table[lo] + t * (table[hi] - table[lo])
+    }
   }
-  // qty > 1000
-  const steps = Math.floor((qty - 1001) / 500) + 1 // 1 при 1001..1500, 2 при 1501..2000, ...
-  return Math.max(4, 7 - steps)
+  return table[breakpoints[breakpoints.length - 1]]
 }
 
 interface Props {
@@ -63,23 +96,17 @@ export default function BusinessCardCalculator({ isActive }: Props) {
 
     const paperPrice = selectedPaper.price
     const laminationPrice = canLaminate ? (LAMINATION_OPTIONS.find(l => l.id === lamination)?.price ?? 0) : 0
-    const printPrice = PRINT_OPTIONS.find(p => p.id === print)!.price
+    const printPrice = getPrintPrice(print, qty) * (urgent ? 1.5 : 1)
 
-    const markup = getMarkup(qty)
-    // Наценка только на бумагу и печать, ламинация — фиксированная цена
-    const basePrintPrice = printPrice * (urgent ? 4 : 1)
-    const pricePerPiece = (paperPrice + basePrintPrice) * markup + laminationPrice
+    let pricePerPiece = printPrice + paperPrice + laminationPrice
+    if (pricePerPiece < MIN_PRICE_PER_PIECE) pricePerPiece = MIN_PRICE_PER_PIECE
 
-    let total = pricePerPiece * qty
-    if (total < MIN_TOTAL) total = MIN_TOTAL
-
-    const realPricePerPiece = total / qty
+    const total = pricePerPiece * qty
 
     return {
       qty,
-      pricePerPiece: realPricePerPiece,
+      pricePerPiece,
       total,
-      markup,
     }
   }, [quantity, customQty, isCustom, paper, lamination, print, urgent, selectedPaper, canLaminate])
 
