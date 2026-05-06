@@ -31,15 +31,15 @@ export default function Layout({ children }: LayoutProps) {
             <Icon name="Send" size={14} />
             @YavaDesign
           </a>
-          <a href="https://max.ru/89963386505" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors flex items-center gap-1.5">
+          <a href="https://web.max.ru/3079469" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors flex items-center gap-1.5">
             <Icon name="MessageCircle" size={14} />
             MAX
           </a>
           <span className="text-zinc-600">|</span>
-          <span className="flex items-center gap-1.5">
+          <a href="https://yandex.ru/maps/213/moscow/house/ulitsa_tolbukhina_13k1/Z04YdQ5pQUwEQFtvfXtzcn1qYw==/?ll=37.399892%2C55.723197&source=serp_navig&z=17" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors flex items-center gap-1.5">
             <Icon name="MapPin" size={14} />
             Толбухина 13к1
-          </span>
+          </a>
         </div>
       </header>
       <div className="relative z-20 h-full">
