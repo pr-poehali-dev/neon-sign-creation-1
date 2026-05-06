@@ -1,5 +1,6 @@
 import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
+import Icon from "@/components/ui/icon"
 import type { SectionProps } from "@/types"
 
 export default function Section({ id, title, subtitle, content, isActive, showButton, buttonText, onButtonClick }: SectionProps) {
@@ -38,16 +39,36 @@ export default function Section({ id, title, subtitle, content, isActive, showBu
           initial={{ opacity: 0, y: 20 }}
           animate={isActive ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.5, delay: 0.4 }}
-          className="mt-12 md:mt-16"
+          className="mt-12 md:mt-16 flex flex-col gap-6"
         >
           <Button
             variant="outline"
             size="lg"
-            className="text-[#FF4D00] bg-transparent border-[#FF4D00] hover:bg-[#FF4D00] hover:text-black transition-colors"
+            className="text-[#FF4D00] bg-transparent border-[#FF4D00] hover:bg-[#FF4D00] hover:text-black transition-colors w-fit"
             onClick={onButtonClick}
           >
             {buttonText}
           </Button>
+          {id === 'join' && (
+            <div className="flex flex-wrap items-center gap-5 text-sm text-zinc-500">
+              <a href="tel:89663386505" className="hover:text-white transition-colors flex items-center gap-1.5">
+                <Icon name="Phone" size={14} />
+                8 966 338-65-05
+              </a>
+              <a href="https://t.me/YavaDesign" target="_blank" rel="noopener noreferrer" className="hover:text-[#2AABEE] transition-colors flex items-center gap-1.5">
+                <Icon name="Send" size={14} />
+                @YavaDesign
+              </a>
+              <a href="https://max.ru/89963386505" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors flex items-center gap-1.5">
+                <Icon name="MessageCircle" size={14} />
+                MAX
+              </a>
+              <span className="flex items-center gap-1.5">
+                <Icon name="MapPin" size={14} />
+                Толбухина 13к1
+              </span>
+            </div>
+          )}
         </motion.div>
       )}
     </section>
