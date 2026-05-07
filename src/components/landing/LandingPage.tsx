@@ -116,29 +116,6 @@ export default function LandingPage() {
             </Link>
           </motion.div>
 
-          {/* Оранжевая лента */}
-          <motion.div
-            className="w-full bg-[#FF4D00] rounded-xl px-6 py-3 flex flex-wrap items-center gap-6 text-white text-sm font-medium mb-12"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.25 }}
-          >
-            <span className="flex items-center gap-2">
-              <Icon name="Clock" size={15} />
-              Пн–Пт: 10:00–20:00
-            </span>
-            <span className="hidden md:block text-white/40">|</span>
-            <span className="flex items-center gap-2">
-              <Icon name="Clock" size={15} />
-              Сб–Вс: 10:00–18:00
-            </span>
-            <span className="hidden md:block text-white/40">|</span>
-            <span className="flex items-center gap-2">
-              <Icon name="MapPin" size={15} />
-              г. Москва, ул. Толбухина 13к1
-            </span>
-          </motion.div>
-
           {/* Меню категорий + Карусель */}
           <motion.div
             className="flex gap-6"

@@ -119,7 +119,7 @@ export default function Hours() {
             style={{ height: '420px' }}
           >
             <iframe
-              src="https://yandex.ru/map-widget/v1/?ll=37.399893%2C55.723197&z=17&pt=37.399893%2C55.723197%2Cpm2rdm~Ява+Принт&l=map"
+              src="https://yandex.ru/map-widget/v1/?ll=37.399893%2C55.723197&z=16&pt=37.399893%2C55.723197%2Cpm2rdm~Ява+Принт&l=map"
               width="100%"
               height="100%"
               frameBorder="0"
