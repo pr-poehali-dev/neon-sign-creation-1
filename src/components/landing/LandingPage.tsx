@@ -2,7 +2,6 @@ import { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import Layout from './Layout'
-import LeadModal from './LeadModal'
 import Icon from '@/components/ui/icon'
 
 const CATEGORIES = [
@@ -53,7 +52,6 @@ const NEWS = [
 ]
 
 export default function LandingPage() {
-  const [modalOpen, setModalOpen] = useState(false)
   const [activeNews, setActiveNews] = useState(0)
   const [hoveredCategory, setHoveredCategory] = useState<string | null>(null)
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
@@ -77,51 +75,15 @@ export default function LandingPage() {
     <Layout>
       <div className="relative z-20 h-full overflow-y-auto">
 
-        {/* HERO */}
-        <section className="min-h-screen flex flex-col justify-center px-8 md:px-16 lg:px-24 pt-24 pb-8">
-          {/* Название + слоган */}
-          <motion.div
-            className="mb-8"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold text-white leading-tight tracking-tight">
-              Ява <span className="text-[#FF4D00]">Дизайн</span>
-            </h1>
-            <p className="text-zinc-400 text-lg md:text-xl mt-3 tracking-wide">
-              Ваша идея — наш результат.
-            </p>
-          </motion.div>
-
-          {/* Кнопки */}
-          <motion.div
-            className="flex flex-wrap items-center gap-3 mb-10"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.15 }}
-          >
-            <button
-              onClick={() => setModalOpen(true)}
-              className="px-6 py-2.5 bg-[#FF4D00] hover:bg-[#cc3d00] text-white text-sm font-semibold rounded-lg transition-colors"
-            >
-              Быстрый расчёт
-            </button>
-            <Link
-              to="/hours"
-              className="px-6 py-2.5 border border-zinc-700 hover:border-zinc-500 text-zinc-300 hover:text-white text-sm rounded-lg transition-colors flex items-center gap-2"
-            >
-              <Icon name="Clock" size={14} />
-              Режим работы
-            </Link>
-          </motion.div>
+        {/* Главный блок */}
+        <section className="min-h-screen flex flex-col justify-center px-8 md:px-16 lg:px-24 pt-40 pb-8">
 
           {/* Меню категорий + Карусель */}
           <motion.div
             className="flex gap-6"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.35 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
           >
             {/* Левое меню */}
             <div className="hidden lg:block w-64 flex-shrink-0">
@@ -231,12 +193,6 @@ export default function LandingPage() {
             transition={{ duration: 0.5, delay: 0.2 }}
             className="flex flex-col gap-6"
           >
-            <button
-              onClick={() => setModalOpen(true)}
-              className="px-8 py-3 bg-[#FF4D00] hover:bg-[#cc3d00] text-white text-base font-semibold rounded-lg transition-colors w-fit"
-            >
-              Оставить заявку
-            </button>
             <div className="flex flex-wrap items-center gap-5 text-sm text-zinc-500">
               <a href="tel:89663386505" className="hover:text-white transition-colors flex items-center gap-1.5">
                 <Icon name="Phone" size={14} />
@@ -258,8 +214,6 @@ export default function LandingPage() {
           </motion.div>
         </section>
       </div>
-
-      <LeadModal isOpen={modalOpen} onClose={() => setModalOpen(false)} />
     </Layout>
   )
 }
