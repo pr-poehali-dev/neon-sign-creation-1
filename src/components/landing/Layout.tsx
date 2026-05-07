@@ -1,4 +1,5 @@
 import { ReactNode } from 'react'
+import { Link, useLocation } from 'react-router-dom'
 import Icon from '@/components/ui/icon'
 import { Squares } from "./squares-background"
 
@@ -7,6 +8,14 @@ interface LayoutProps {
 }
 
 export default function Layout({ children }: LayoutProps) {
+  const location = useLocation()
+
+  const navLinks = [
+    { to: '/', label: 'Главная' },
+    { to: '/about', label: 'О нас' },
+    { to: '/prices', label: 'Калькулятор' },
+  ]
+
   return (
     <div className="h-screen overflow-hidden bg-black relative">
       <div className="absolute inset-0 z-10">
@@ -19,9 +28,26 @@ export default function Layout({ children }: LayoutProps) {
         />
       </div>
       <header className="absolute top-0 left-0 right-0 z-30 px-8 py-5 flex items-center justify-between">
-        <span className="text-white font-bold text-xl tracking-wide">
-          Ява <span className="text-[#FF4D00]">Дизайн</span>
-        </span>
+        <div className="flex items-center gap-8">
+          <Link to="/" className="text-white font-bold text-xl tracking-wide hover:opacity-80 transition-opacity">
+            Ява <span className="text-[#FF4D00]">Дизайн</span>
+          </Link>
+          <nav className="hidden md:flex items-center gap-1">
+            {navLinks.map(link => (
+              <Link
+                key={link.to}
+                to={link.to}
+                className={`px-3 py-1.5 rounded-lg text-sm transition-colors ${
+                  location.pathname === link.to
+                    ? 'text-white bg-zinc-800'
+                    : 'text-zinc-400 hover:text-white hover:bg-zinc-900'
+                }`}
+              >
+                {link.label}
+              </Link>
+            ))}
+          </nav>
+        </div>
         <div className="hidden md:flex items-center gap-5 text-sm text-zinc-400">
           <a href="tel:89663386505" className="hover:text-white transition-colors flex items-center gap-1.5">
             <Icon name="Phone" size={14} />

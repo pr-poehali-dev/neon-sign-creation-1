@@ -73,9 +73,10 @@ function getPrice(paperId: string, printId: string, qty: number): number {
 
 interface Props {
   isActive: boolean
+  inline?: boolean
 }
 
-export default function BusinessCardCalculator({ isActive }: Props) {
+export default function BusinessCardCalculator({ isActive, inline = false }: Props) {
   const [quantity, setQuantity] = useState<number | ''>(100)
   const [customQty, setCustomQty] = useState('')
   const [isCustom, setIsCustom] = useState(false)
@@ -117,6 +118,177 @@ export default function BusinessCardCalculator({ isActive }: Props) {
     setQuantity('')
   }
 
+  const formJSX = (
+    <div className="flex flex-col gap-7">
+      <div>
+        <Label className="text-zinc-400 text-sm mb-3 block">Тираж, шт.</Label>
+        <div className="flex flex-wrap gap-2">
+          {PRESET_QUANTITIES.map(q => (
+            <button
+              key={q}
+              onClick={() => handlePreset(q)}
+              className={`px-3 py-1.5 rounded text-sm border transition-colors ${
+                !isCustom && quantity === q
+                  ? 'bg-[#FF4D00] border-[#FF4D00] text-white'
+                  : 'border-zinc-700 text-zinc-400 hover:border-zinc-500'
+              }`}
+            >
+              {q}
+            </button>
+          ))}
+          <button
+            onClick={handleCustom}
+            className={`px-3 py-1.5 rounded text-sm border transition-colors ${
+              isCustom
+                ? 'bg-[#FF4D00] border-[#FF4D00] text-white'
+                : 'border-zinc-700 text-zinc-400 hover:border-zinc-500'
+            }`}
+          >
+            Свой тираж
+          </button>
+        </div>
+        {isCustom && (
+          <Input
+            className="mt-3 bg-transparent border-zinc-700 text-white placeholder:text-zinc-600 w-40"
+            placeholder="Введите кол-во"
+            type="number"
+            min={1}
+            value={customQty}
+            onChange={e => setCustomQty(e.target.value)}
+          />
+        )}
+      </div>
+
+      <div>
+        <Label className="text-zinc-400 text-sm mb-3 block">Бумага</Label>
+        <div className="flex flex-wrap gap-2">
+          {PAPER_OPTIONS.map(p => (
+            <button
+              key={p.id}
+              onClick={() => {
+                setPaper(p.id)
+                if (!p.lamination) setLamination('none')
+              }}
+              className={`px-3 py-1.5 rounded text-sm border transition-colors ${
+                paper === p.id
+                  ? 'bg-[#FF4D00] border-[#FF4D00] text-white'
+                  : 'border-zinc-700 text-zinc-400 hover:border-zinc-500'
+              }`}
+            >
+              {p.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div>
+        <Label className="text-zinc-400 text-sm mb-3 block">Печать</Label>
+        <div className="flex flex-wrap gap-2">
+          {PRINT_OPTIONS.map(p => (
+            <button
+              key={p.id}
+              onClick={() => setPrint(p.id)}
+              className={`px-3 py-1.5 rounded text-sm border transition-colors ${
+                print === p.id
+                  ? 'bg-[#FF4D00] border-[#FF4D00] text-white'
+                  : 'border-zinc-700 text-zinc-400 hover:border-zinc-500'
+              }`}
+            >
+              {p.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div>
+        <Label className={`text-sm mb-3 block ${canLaminate ? 'text-zinc-400' : 'text-zinc-600'}`}>
+          Ламинация {!canLaminate && <span className="text-zinc-600 text-xs">(недоступна для дизайнерской бумаги)</span>}
+        </Label>
+        <div className="flex flex-wrap gap-2">
+          {LAMINATION_OPTIONS.map(l => (
+            <button
+              key={l.id}
+              disabled={!canLaminate && l.id !== 'none'}
+              onClick={() => setLamination(l.id)}
+              className={`px-3 py-1.5 rounded text-sm border transition-colors disabled:opacity-30 disabled:cursor-not-allowed ${
+                lamination === l.id
+                  ? 'bg-[#FF4D00] border-[#FF4D00] text-white'
+                  : 'border-zinc-700 text-zinc-400 hover:border-zinc-500'
+              }`}
+            >
+              {l.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div>
+        <Label className="text-zinc-400 text-sm mb-3 block">Срочность</Label>
+        <div className="flex gap-2">
+          <button
+            onClick={() => setUrgent(false)}
+            className={`px-3 py-1.5 rounded text-sm border transition-colors ${
+              !urgent
+                ? 'bg-[#FF4D00] border-[#FF4D00] text-white'
+                : 'border-zinc-700 text-zinc-400 hover:border-zinc-500'
+            }`}
+          >
+            Обычная
+          </button>
+          <button
+            onClick={() => setUrgent(true)}
+            className={`px-3 py-1.5 rounded text-sm border transition-colors ${
+              urgent
+                ? 'bg-[#FF4D00] border-[#FF4D00] text-white'
+                : 'border-zinc-700 text-zinc-400 hover:border-zinc-500'
+            }`}
+          >
+            Срочная
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+
+  const resultJSX = (
+    <div className="flex flex-col justify-center">
+      {result ? (
+        <div className="border border-zinc-800 rounded-xl p-8 bg-zinc-900/50 backdrop-blur-sm">
+          <div className="mb-6">
+            <p className="text-zinc-500 text-sm mb-1">Тираж</p>
+            <p className="text-white text-2xl font-semibold">{result.qty.toLocaleString('ru-RU')} шт.</p>
+          </div>
+          <div className="mb-6">
+            <p className="text-zinc-500 text-sm mb-1">Цена за штуку</p>
+            <p className="text-zinc-400 text-base">{result.pricePerPiece.toFixed(2)} руб.</p>
+          </div>
+          <div className="border-t border-zinc-800 pt-6">
+            <p className="text-zinc-500 text-sm mb-1">Итого</p>
+            <p className="text-[#FF4D00] text-4xl font-bold">
+              {result.total.toLocaleString('ru-RU', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} ₽
+            </p>
+          </div>
+          <Button className="mt-8 w-full bg-[#FF4D00] hover:bg-[#cc3d00] text-white border-0" size="lg">
+            Заказать
+          </Button>
+        </div>
+      ) : (
+        <div className="border border-zinc-800 rounded-xl p-8 bg-zinc-900/50 text-zinc-600 text-center">
+          Укажите тираж для расчёта
+        </div>
+      )}
+    </div>
+  )
+
+  if (inline) {
+    return (
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 max-w-5xl">
+        {formJSX}
+        {resultJSX}
+      </div>
+    )
+  }
+
   return (
     <section className="relative min-h-screen w-full snap-start flex flex-col justify-center p-8 md:p-16 lg:p-24">
       <motion.h2
@@ -134,177 +306,8 @@ export default function BusinessCardCalculator({ isActive }: Props) {
         animate={isActive ? { opacity: 1, y: 0 } : {}}
         transition={{ duration: 0.5, delay: 0.2 }}
       >
-        {/* Левая колонка — параметры */}
-        <div className="flex flex-col gap-7">
-
-          {/* Тираж */}
-          <div>
-            <Label className="text-zinc-400 text-sm mb-3 block">Тираж, шт.</Label>
-            <div className="flex flex-wrap gap-2">
-              {PRESET_QUANTITIES.map(q => (
-                <button
-                  key={q}
-                  onClick={() => handlePreset(q)}
-                  className={`px-3 py-1.5 rounded text-sm border transition-colors ${
-                    !isCustom && quantity === q
-                      ? 'bg-[#FF4D00] border-[#FF4D00] text-white'
-                      : 'border-zinc-700 text-zinc-400 hover:border-zinc-500'
-                  }`}
-                >
-                  {q}
-                </button>
-              ))}
-              <button
-                onClick={handleCustom}
-                className={`px-3 py-1.5 rounded text-sm border transition-colors ${
-                  isCustom
-                    ? 'bg-[#FF4D00] border-[#FF4D00] text-white'
-                    : 'border-zinc-700 text-zinc-400 hover:border-zinc-500'
-                }`}
-              >
-                Свой тираж
-              </button>
-            </div>
-            {isCustom && (
-              <Input
-                className="mt-3 bg-transparent border-zinc-700 text-white placeholder:text-zinc-600 w-40"
-                placeholder="Введите кол-во"
-                type="number"
-                min={1}
-                value={customQty}
-                onChange={e => setCustomQty(e.target.value)}
-              />
-            )}
-          </div>
-
-          {/* Печать */}
-          <div>
-            <Label className="text-zinc-400 text-sm mb-3 block">Печать</Label>
-            <div className="flex flex-wrap gap-2">
-              {PRINT_OPTIONS.map(p => (
-                <button
-                  key={p.id}
-                  onClick={() => setPrint(p.id)}
-                  className={`px-3 py-1.5 rounded text-sm border transition-colors ${
-                    print === p.id
-                      ? 'bg-[#FF4D00] border-[#FF4D00] text-white'
-                      : 'border-zinc-700 text-zinc-400 hover:border-zinc-500'
-                  }`}
-                >
-                  {p.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Бумага */}
-          <div>
-            <Label className="text-zinc-400 text-sm mb-3 block">Бумага</Label>
-            <div className="flex flex-wrap gap-2">
-              {PAPER_OPTIONS.map(p => (
-                <button
-                  key={p.id}
-                  onClick={() => {
-                    setPaper(p.id)
-                    if (!p.lamination) setLamination('none')
-                  }}
-                  className={`px-3 py-1.5 rounded text-sm border transition-colors ${
-                    paper === p.id
-                      ? 'bg-[#FF4D00] border-[#FF4D00] text-white'
-                      : 'border-zinc-700 text-zinc-400 hover:border-zinc-500'
-                  }`}
-                >
-                  {p.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Ламинация */}
-          <div>
-            <Label className={`text-sm mb-3 block ${canLaminate ? 'text-zinc-400' : 'text-zinc-600'}`}>
-              Ламинация {!canLaminate && <span className="text-zinc-600 text-xs">(недоступна для дизайнерской бумаги)</span>}
-            </Label>
-            <div className="flex flex-wrap gap-2">
-              {LAMINATION_OPTIONS.map(l => (
-                <button
-                  key={l.id}
-                  disabled={!canLaminate && l.id !== 'none'}
-                  onClick={() => setLamination(l.id)}
-                  className={`px-3 py-1.5 rounded text-sm border transition-colors disabled:opacity-30 disabled:cursor-not-allowed ${
-                    lamination === l.id
-                      ? 'bg-[#FF4D00] border-[#FF4D00] text-white'
-                      : 'border-zinc-700 text-zinc-400 hover:border-zinc-500'
-                  }`}
-                >
-                  {l.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Срочность */}
-          <div>
-            <Label className="text-zinc-400 text-sm mb-3 block">Срочность</Label>
-            <div className="flex gap-2">
-              <button
-                onClick={() => setUrgent(false)}
-                className={`px-3 py-1.5 rounded text-sm border transition-colors ${
-                  !urgent
-                    ? 'bg-[#FF4D00] border-[#FF4D00] text-white'
-                    : 'border-zinc-700 text-zinc-400 hover:border-zinc-500'
-                }`}
-              >
-                Обычная
-              </button>
-              <button
-                onClick={() => setUrgent(true)}
-                className={`px-3 py-1.5 rounded text-sm border transition-colors ${
-                  urgent
-                    ? 'bg-[#FF4D00] border-[#FF4D00] text-white'
-                    : 'border-zinc-700 text-zinc-400 hover:border-zinc-500'
-                }`}
-              >
-                Срочная
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Правая колонка — результат */}
-        <div className="flex flex-col justify-center">
-          {result ? (
-            <div className="border border-zinc-800 rounded-xl p-8 bg-zinc-900/50 backdrop-blur-sm">
-              <div className="mb-6">
-                <p className="text-zinc-500 text-sm mb-1">Тираж</p>
-                <p className="text-white text-2xl font-semibold">{result.qty.toLocaleString('ru-RU')} шт.</p>
-              </div>
-              <div className="mb-6">
-                <p className="text-zinc-500 text-sm mb-1">Цена за штуку</p>
-                <p className="text-zinc-400 text-base">
-                  {result.pricePerPiece.toFixed(2)} руб.
-                </p>
-              </div>
-              <div className="border-t border-zinc-800 pt-6">
-                <p className="text-zinc-500 text-sm mb-1">Итого</p>
-                <p className="text-[#FF4D00] text-4xl font-bold">
-                  {result.total.toLocaleString('ru-RU', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} ₽
-                </p>
-
-              </div>
-              <Button
-                className="mt-8 w-full bg-[#FF4D00] hover:bg-[#cc3d00] text-white border-0"
-                size="lg"
-              >
-                Заказать
-              </Button>
-            </div>
-          ) : (
-            <div className="border border-zinc-800 rounded-xl p-8 bg-zinc-900/50 text-zinc-600 text-center">
-              Укажите тираж для расчёта
-            </div>
-          )}
-        </div>
+        {formJSX}
+        {resultJSX}
       </motion.div>
     </section>
   )
