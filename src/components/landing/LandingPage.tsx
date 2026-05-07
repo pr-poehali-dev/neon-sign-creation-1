@@ -1,78 +1,287 @@
-import { useEffect, useRef, useState } from 'react'
-import { motion, useScroll, useSpring } from 'framer-motion'
-import Section from './Section'
+import { useState, useEffect, useRef } from 'react'
+import { Link } from 'react-router-dom'
+import { motion, AnimatePresence } from 'framer-motion'
 import Layout from './Layout'
 import LeadModal from './LeadModal'
-import { sections } from './sections'
+import Icon from '@/components/ui/icon'
+
+const CATEGORIES = [
+  { id: 'digital', label: 'Цифровая печать', icon: 'Printer' },
+  { id: 'wide', label: 'Широкоформатная печать', icon: 'Monitor' },
+  { id: 'uv', label: 'УФ-печать', icon: 'Zap' },
+  { id: 'stickers', label: 'Наклейки', icon: 'Tag' },
+  { id: 'popular', label: 'Популярная полиграфия', icon: 'Star' },
+  { id: 'engineering', label: 'Инженерная печать', icon: 'Building2' },
+  { id: 'postprint', label: 'Постпечатная обработка', icon: 'Scissors' },
+  { id: 'restaurant', label: 'Для ресторанов и кафе', icon: 'Coffee' },
+  { id: 'students', label: 'Для студентов и учащихся', icon: 'GraduationCap' },
+  { id: 'business', label: 'Бизнес и мероприятия', icon: 'Briefcase' },
+  { id: 'souvenirs', label: 'Сувенирная продукция', icon: 'Gift' },
+  { id: 'kids', label: 'Для детей', icon: 'Smile' },
+  { id: 'design', label: 'Дизайн и верстка', icon: 'PenTool' },
+]
+
+const NEWS = [
+  {
+    id: 1,
+    tag: 'Акция',
+    title: 'Скидка 10% на первый заказ',
+    desc: 'Новым клиентам — скидка 10% на любую печатную продукцию. Просто упомяните при заказе.',
+    color: 'from-[#FF4D00] to-[#ff7a40]',
+  },
+  {
+    id: 2,
+    tag: 'Новинка',
+    title: 'Soft Touch ламинация',
+    desc: 'Бархатистое покрытие для визиток и буклетов. Ощущение роскоши в каждом прикосновении.',
+    color: 'from-zinc-800 to-zinc-700',
+  },
+  {
+    id: 3,
+    tag: 'Акция',
+    title: 'Визитки 1000 шт. от 5 280 ₽',
+    desc: 'Цифровая печать матовых визиток тиражом 1000 штук с быстрым сроком изготовления.',
+    color: 'from-[#1a1a2e] to-[#16213e]',
+  },
+  {
+    id: 4,
+    tag: 'Услуга',
+    title: 'Срочная печать за 2 часа',
+    desc: 'Нужно срочно? Выполним заказ за 2 часа прямо в день обращения. Работаем без выходных.',
+    color: 'from-zinc-900 to-zinc-800',
+  },
+]
 
 export default function LandingPage() {
-  const [activeSection, setActiveSection] = useState(0)
   const [modalOpen, setModalOpen] = useState(false)
-  const containerRef = useRef<HTMLDivElement>(null)
-  const { scrollYProgress } = useScroll({ container: containerRef })
-  const scaleX = useSpring(scrollYProgress, { stiffness: 100, damping: 30, restDelta: 0.001 })
+  const [activeNews, setActiveNews] = useState(0)
+  const [hoveredCategory, setHoveredCategory] = useState<string | null>(null)
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
   useEffect(() => {
-    const handleScroll = () => {
-      if (containerRef.current) {
-        const scrollPosition = containerRef.current.scrollTop
-        const windowHeight = window.innerHeight
-        const newActiveSection = Math.floor(scrollPosition / windowHeight)
-        setActiveSection(newActiveSection)
-      }
-    }
-
-    const container = containerRef.current
-    if (container) {
-      container.addEventListener('scroll', handleScroll)
-    }
-
-    return () => {
-      if (container) {
-        container.removeEventListener('scroll', handleScroll)
-      }
-    }
+    timerRef.current = setInterval(() => {
+      setActiveNews(prev => (prev + 1) % NEWS.length)
+    }, 4000)
+    return () => { if (timerRef.current) clearInterval(timerRef.current) }
   }, [])
 
-  const handleNavClick = (index: number) => {
-    if (containerRef.current) {
-      containerRef.current.scrollTo({
-        top: index * window.innerHeight,
-        behavior: 'smooth'
-      })
-    }
+  const goToNews = (i: number) => {
+    setActiveNews(i)
+    if (timerRef.current) clearInterval(timerRef.current)
+    timerRef.current = setInterval(() => {
+      setActiveNews(prev => (prev + 1) % NEWS.length)
+    }, 4000)
   }
 
   return (
     <Layout>
-      <nav className="fixed top-0 right-0 h-screen flex flex-col justify-center z-30 p-4">
-        {sections.map((_, index) => (
-          <button
-            key={index}
-            className={`w-3 h-3 rounded-full my-2 transition-all ${
-              index === activeSection ? 'bg-white scale-150' : 'bg-gray-600'
-            }`}
-            onClick={() => handleNavClick(index)}
-          />
-        ))}
-      </nav>
-      <motion.div
-        className="fixed top-0 left-0 right-0 h-0.5 bg-white origin-left z-30"
-        style={{ scaleX }}
-      />
-      <div
-        ref={containerRef}
-        className="h-full overflow-y-auto snap-y snap-mandatory"
-      >
-        {sections.map((section, index) => (
-          <Section
-            key={section.id}
-            {...section}
-            isActive={index === activeSection}
-            onButtonClick={() => setModalOpen(true)}
-          />
-        ))}
+      <div className="relative z-20 h-full overflow-y-auto">
+
+        {/* HERO */}
+        <section className="min-h-screen flex flex-col justify-center px-8 md:px-16 lg:px-24 pt-24 pb-8">
+          {/* Название + слоган */}
+          <motion.div
+            className="mb-8"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold text-white leading-tight tracking-tight">
+              Ява <span className="text-[#FF4D00]">Дизайн</span>
+            </h1>
+            <p className="text-zinc-400 text-lg md:text-xl mt-3 tracking-wide">
+              Ваша идея — наш результат.
+            </p>
+          </motion.div>
+
+          {/* Кнопки */}
+          <motion.div
+            className="flex flex-wrap items-center gap-3 mb-10"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.15 }}
+          >
+            <button
+              onClick={() => setModalOpen(true)}
+              className="px-6 py-2.5 bg-[#FF4D00] hover:bg-[#cc3d00] text-white text-sm font-semibold rounded-lg transition-colors"
+            >
+              Быстрый расчёт
+            </button>
+            <Link
+              to="/hours"
+              className="px-6 py-2.5 border border-zinc-700 hover:border-zinc-500 text-zinc-300 hover:text-white text-sm rounded-lg transition-colors flex items-center gap-2"
+            >
+              <Icon name="Clock" size={14} />
+              Режим работы
+            </Link>
+          </motion.div>
+
+          {/* Оранжевая лента */}
+          <motion.div
+            className="w-full bg-[#FF4D00] rounded-xl px-6 py-3 flex flex-wrap items-center gap-6 text-white text-sm font-medium mb-12"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.25 }}
+          >
+            <span className="flex items-center gap-2">
+              <Icon name="Clock" size={15} />
+              Пн–Пт: 10:00–20:00
+            </span>
+            <span className="hidden md:block text-white/40">|</span>
+            <span className="flex items-center gap-2">
+              <Icon name="Clock" size={15} />
+              Сб–Вс: 10:00–18:00
+            </span>
+            <span className="hidden md:block text-white/40">|</span>
+            <span className="flex items-center gap-2">
+              <Icon name="MapPin" size={15} />
+              г. Москва, ул. Толбухина 13к1
+            </span>
+          </motion.div>
+
+          {/* Меню категорий + Карусель */}
+          <motion.div
+            className="flex gap-6"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.35 }}
+          >
+            {/* Левое меню */}
+            <div className="hidden lg:block w-64 flex-shrink-0">
+              <ul className="space-y-0.5">
+                {CATEGORIES.map(cat => (
+                  <li key={cat.id}>
+                    <Link
+                      to="/prices"
+                      onMouseEnter={() => setHoveredCategory(cat.id)}
+                      onMouseLeave={() => setHoveredCategory(null)}
+                      className={`flex items-center justify-between gap-3 px-3 py-2 rounded-lg text-sm transition-all group ${
+                        hoveredCategory === cat.id
+                          ? 'bg-zinc-800 text-[#FF4D00]'
+                          : 'text-zinc-400 hover:text-[#FF4D00] hover:bg-zinc-900'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <Icon name={cat.icon} size={14} className={hoveredCategory === cat.id ? 'text-[#FF4D00]' : 'text-zinc-600 group-hover:text-[#FF4D00]'} />
+                        <span>{cat.label}</span>
+                      </div>
+                      <Icon name="ChevronRight" size={13} className="text-zinc-600 flex-shrink-0" />
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Карусель новостей */}
+            <div className="flex-1 min-w-0">
+              <div className="relative h-64 md:h-80 rounded-2xl overflow-hidden">
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={activeNews}
+                    className={`absolute inset-0 bg-gradient-to-br ${NEWS[activeNews].color} p-8 md:p-10 flex flex-col justify-end`}
+                    initial={{ opacity: 0, x: 40 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -40 }}
+                    transition={{ duration: 0.4 }}
+                  >
+                    <span className="inline-block px-3 py-1 bg-white/20 backdrop-blur-sm text-white text-xs font-semibold rounded-full mb-3 w-fit">
+                      {NEWS[activeNews].tag}
+                    </span>
+                    <h3 className="text-white text-2xl md:text-3xl font-bold mb-2 leading-tight">
+                      {NEWS[activeNews].title}
+                    </h3>
+                    <p className="text-white/80 text-sm md:text-base leading-relaxed">
+                      {NEWS[activeNews].desc}
+                    </p>
+                  </motion.div>
+                </AnimatePresence>
+
+                {/* Точки навигации */}
+                <div className="absolute bottom-4 left-8 flex gap-2 z-10">
+                  {NEWS.map((_, i) => (
+                    <button
+                      key={i}
+                      onClick={() => goToNews(i)}
+                      className={`h-1.5 rounded-full transition-all ${
+                        i === activeNews ? 'w-6 bg-white' : 'w-3 bg-white/40'
+                      }`}
+                    />
+                  ))}
+                </div>
+
+                {/* Стрелки */}
+                <button
+                  onClick={() => goToNews((activeNews - 1 + NEWS.length) % NEWS.length)}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 bg-black/30 hover:bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center text-white transition-colors z-10"
+                >
+                  <Icon name="ChevronLeft" size={16} />
+                </button>
+                <button
+                  onClick={() => goToNews((activeNews + 1) % NEWS.length)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 bg-black/30 hover:bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center text-white transition-colors z-10"
+                >
+                  <Icon name="ChevronRight" size={16} />
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        </section>
+
+        {/* Слайд 2: Готовы к печати */}
+        <section className="min-h-screen flex flex-col justify-center px-8 md:px-16 lg:px-24">
+          <motion.h2
+            className="text-4xl md:text-6xl lg:text-[5rem] font-bold leading-[1.1] tracking-tight text-white mb-8 max-w-3xl"
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+          >
+            Готовы к печати?
+          </motion.h2>
+          <motion.p
+            className="text-zinc-400 text-lg md:text-xl max-w-2xl leading-relaxed mb-10"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+          >
+            Оставьте заявку — мы свяжемся в течение 30 минут, рассчитаем стоимость и сроки. Первый заказ со скидкой 10%.
+          </motion.p>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="flex flex-col gap-6"
+          >
+            <button
+              onClick={() => setModalOpen(true)}
+              className="px-8 py-3 bg-[#FF4D00] hover:bg-[#cc3d00] text-white text-base font-semibold rounded-lg transition-colors w-fit"
+            >
+              Оставить заявку
+            </button>
+            <div className="flex flex-wrap items-center gap-5 text-sm text-zinc-500">
+              <a href="tel:89663386505" className="hover:text-white transition-colors flex items-center gap-1.5">
+                <Icon name="Phone" size={14} />
+                8 966 338-65-05
+              </a>
+              <a href="https://t.me/YavaDesign" target="_blank" rel="noopener noreferrer" className="hover:text-[#2AABEE] transition-colors flex items-center gap-1.5">
+                <Icon name="Send" size={14} />
+                @YavaDesign
+              </a>
+              <a href="https://max.ru/u/f9LHodD0cOL8MiE9Z8F-z-o-BaYnKOXpJi31ljzSTyZ2g8cckpoq90QIad8" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors flex items-center gap-1.5">
+                <Icon name="MessageCircle" size={14} />
+                MAX
+              </a>
+              <a href="https://yandex.ru/maps/213/moscow/house/ulitsa_tolbukhina_13k1/Z04YdQ5pQUwEQFtvfXtzcn1qYw==/?ll=37.399892%2C55.723197&source=serp_navig&z=17" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors flex items-center gap-1.5">
+                <Icon name="MapPin" size={14} />
+                Толбухина 13к1
+              </a>
+            </div>
+          </motion.div>
+        </section>
       </div>
+
       <LeadModal isOpen={modalOpen} onClose={() => setModalOpen(false)} />
     </Layout>
   )
