@@ -6,9 +6,11 @@ import LeadModal from './LeadModal'
 
 interface LayoutProps {
   children: ReactNode
+  pageTitle?: string
+  pageSubtitle?: string
 }
 
-export default function Layout({ children }: LayoutProps) {
+export default function Layout({ children, pageTitle, pageSubtitle }: LayoutProps) {
   const location = useLocation()
   const [modalOpen, setModalOpen] = useState(false)
 
@@ -36,9 +38,8 @@ export default function Layout({ children }: LayoutProps) {
         />
       </div>
 
-      {/* ШАПКА */}
+      {/* ШАПКА — навигация */}
       <header className="absolute top-0 left-0 right-0 z-30 px-8 py-3 flex items-center justify-between">
-        {/* Навигация */}
         <nav className="hidden md:flex items-center gap-1">
           {navLinks.map(link => (
             <Link
@@ -55,7 +56,6 @@ export default function Layout({ children }: LayoutProps) {
           ))}
         </nav>
 
-        {/* Контакты справа */}
         <div className="hidden md:flex items-center gap-1">
           <a href="tel:89663386505" className="px-3 py-1.5 rounded-lg text-sm text-zinc-400 hover:text-white hover:bg-zinc-900 transition-colors flex items-center gap-1.5">
             <Icon name="Phone" size={13} />
@@ -72,28 +72,36 @@ export default function Layout({ children }: LayoutProps) {
         </div>
       </header>
 
-      {/* HERO-БЛОК — постоянный на всех страницах */}
-      <div className="absolute top-12 left-0 right-0 z-30 px-8 md:px-16 py-4 flex items-center justify-between">
-        <Link to="/" className="group">
-          <h2 className="text-3xl md:text-4xl font-bold text-white leading-none tracking-tight">
-            Ява <span className="text-[#FF4D00]">Дизайн</span>
-          </h2>
-          <p className="text-zinc-500 text-sm mt-1 group-hover:text-zinc-400 transition-colors">
+      {/* HERO BANNER — оранжевая полоса под шапкой */}
+      <div className="absolute top-10 left-0 right-0 z-30 bg-[#FF4D00] px-8 md:px-16 py-3 flex items-center justify-between">
+        <Link to="/" className="group flex-shrink-0">
+          <div className="flex items-baseline gap-0">
+            <span className="text-2xl md:text-3xl font-bold text-white leading-none tracking-tight">
+              Ява&nbsp;<span className="text-black">Дизайн</span>
+            </span>
+          </div>
+          <p className="text-white/70 text-xs mt-0.5 group-hover:text-white/90 transition-colors">
             Ваша идея — наш результат.
           </p>
         </Link>
 
-        {/* Кнопки справа */}
-        <div className="flex items-center gap-3">
+        {pageTitle && (
+          <div className="flex-1 px-8 hidden md:block">
+            <h1 className="text-white font-bold text-lg leading-tight truncate">{pageTitle}</h1>
+            {pageSubtitle && <p className="text-white/70 text-xs truncate">{pageSubtitle}</p>}
+          </div>
+        )}
+
+        <div className="flex items-center gap-2 flex-shrink-0">
           <button
             onClick={() => setModalOpen(true)}
-            className="px-5 py-2 bg-[#FF4D00] hover:bg-[#cc3d00] text-white text-sm font-semibold rounded-lg transition-colors"
+            className="px-4 py-1.5 bg-white hover:bg-zinc-100 text-[#FF4D00] text-sm font-semibold rounded-lg transition-colors"
           >
             Быстрый расчёт
           </button>
           <Link
             to="/hours"
-            className="px-5 py-2 border border-zinc-700 hover:border-zinc-500 text-zinc-300 hover:text-white text-sm rounded-lg transition-colors flex items-center gap-2"
+            className="px-4 py-1.5 border border-white/40 hover:border-white text-white text-sm rounded-lg transition-colors flex items-center gap-1.5"
           >
             <Icon name="Clock" size={13} />
             Режим работы

@@ -44,7 +44,7 @@ export default function News() {
   return (
     <Layout>
       <div className="relative z-20 min-h-screen overflow-y-auto">
-        <div className="px-8 md:px-16 lg:px-24 pt-28 pb-16 max-w-4xl">
+        <div className="px-8 md:px-16 lg:px-24 pt-36 pb-16 max-w-4xl">
           <motion.h1
             className="text-4xl md:text-6xl font-bold text-white mb-3 leading-tight"
             initial={{ opacity: 0, y: 30 }}

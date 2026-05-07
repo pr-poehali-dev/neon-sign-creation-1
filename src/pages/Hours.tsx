@@ -21,7 +21,7 @@ export default function Hours() {
   return (
     <Layout>
       <div className="relative z-20 min-h-screen overflow-y-auto">
-        <div className="px-8 md:px-16 lg:px-24 pt-28 pb-16">
+        <div className="px-8 md:px-16 lg:px-24 pt-36 pb-16">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}

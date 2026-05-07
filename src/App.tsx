@@ -10,6 +10,7 @@ import Prices from "./pages/Prices";
 import Hours from "./pages/Hours";
 import News from "./pages/News";
 import LayoutRequirements from "./pages/LayoutRequirements";
+import Services from "./pages/Services";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -27,6 +28,7 @@ const App = () => (
           <Route path="/hours" element={<Hours />} />
           <Route path="/news" element={<News />} />
           <Route path="/knowledge/layout-requirements" element={<LayoutRequirements />} />
+          <Route path="/services" element={<Services />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

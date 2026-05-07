@@ -6,7 +6,7 @@ export default function About() {
     <Layout>
       <div className="relative z-20 min-h-screen overflow-y-auto">
         {/* Секция 1: Всё под одной крышей */}
-        <section className="min-h-screen flex flex-col justify-center p-8 md:p-16 lg:p-24">
+        <section className="min-h-screen flex flex-col justify-center p-8 md:p-16 lg:p-24 pt-36 md:pt-36 lg:pt-36">
           <motion.h2
             className="text-4xl md:text-6xl lg:text-[5rem] font-bold leading-[1.1] tracking-tight text-white mb-8 max-w-4xl"
             initial={{ opacity: 0, y: 40 }}
