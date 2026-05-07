@@ -31,7 +31,7 @@ export default function Layout({ children }: LayoutProps) {
             <Icon name="Send" size={14} />
             @YavaDesign
           </a>
-          <a href="https://web.max.ru/3079469" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors flex items-center gap-1.5">
+          <a href="https://max.ru/u/f9LHodD0cOL8MiE9Z8F-z-o-BaYnKOXpJi31ljzSTyZ2g8cckpoq90QIad8" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors flex items-center gap-1.5">
             <Icon name="MessageCircle" size={14} />
             MAX
           </a>
