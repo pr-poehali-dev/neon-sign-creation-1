@@ -1,4 +1,4 @@
-import { ReactNode, useState } from 'react'
+import { ReactNode, useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import Icon from '@/components/ui/icon'
 import { Squares } from "./squares-background"
@@ -12,9 +12,16 @@ export default function Layout({ children }: LayoutProps) {
   const location = useLocation()
   const [modalOpen, setModalOpen] = useState(false)
 
+  useEffect(() => {
+    const handler = () => setModalOpen(true)
+    window.addEventListener('open-lead-modal', handler)
+    return () => window.removeEventListener('open-lead-modal', handler)
+  }, [])
+
   const navLinks = [
     { to: '/about', label: 'О нас' },
     { to: '/news', label: 'Новости' },
+    { to: '/knowledge/layout-requirements', label: 'Требования к макету' },
   ]
 
   return (
@@ -49,17 +56,17 @@ export default function Layout({ children }: LayoutProps) {
         </nav>
 
         {/* Контакты справа */}
-        <div className="hidden md:flex items-center gap-4 text-xs text-zinc-500">
-          <a href="tel:89663386505" className="hover:text-white transition-colors flex items-center gap-1.5">
-            <Icon name="Phone" size={12} />
+        <div className="hidden md:flex items-center gap-1">
+          <a href="tel:89663386505" className="px-3 py-1.5 rounded-lg text-sm text-zinc-400 hover:text-white hover:bg-zinc-900 transition-colors flex items-center gap-1.5">
+            <Icon name="Phone" size={13} />
             8 966 338-65-05
           </a>
-          <a href="https://t.me/YavaDesign" target="_blank" rel="noopener noreferrer" className="hover:text-[#2AABEE] transition-colors flex items-center gap-1.5">
-            <Icon name="Send" size={12} />
+          <a href="https://t.me/YavaDesign" target="_blank" rel="noopener noreferrer" className="px-3 py-1.5 rounded-lg text-sm text-zinc-400 hover:text-white hover:bg-zinc-900 transition-colors flex items-center gap-1.5">
+            <Icon name="Send" size={13} />
             @YavaDesign
           </a>
-          <a href="https://max.ru/u/f9LHodD0cOL8MiE9Z8F-z-o-BaYnKOXpJi31ljzSTyZ2g8cckpoq90QIad8" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors flex items-center gap-1.5">
-            <Icon name="MessageCircle" size={12} />
+          <a href="https://max.ru/u/f9LHodD0cOL8MiE9Z8F-z-o-BaYnKOXpJi31ljzSTyZ2g8cckpoq90QIad8" target="_blank" rel="noopener noreferrer" className="px-3 py-1.5 rounded-lg text-sm text-zinc-400 hover:text-white hover:bg-zinc-900 transition-colors flex items-center gap-1.5">
+            <Icon name="MessageCircle" size={13} />
             MAX
           </a>
         </div>

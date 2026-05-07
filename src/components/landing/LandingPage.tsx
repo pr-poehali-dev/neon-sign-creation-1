@@ -193,6 +193,15 @@ export default function LandingPage() {
             transition={{ duration: 0.5, delay: 0.2 }}
             className="flex flex-col gap-6"
           >
+            <button
+              onClick={() => {
+                const event = new CustomEvent('open-lead-modal')
+                window.dispatchEvent(event)
+              }}
+              className="px-8 py-3 bg-[#FF4D00] hover:bg-[#cc3d00] text-white text-base font-semibold rounded-lg transition-colors w-fit"
+            >
+              Оставить заявку
+            </button>
             <div className="flex flex-wrap items-center gap-5 text-sm text-zinc-500">
               <a href="tel:89663386505" className="hover:text-white transition-colors flex items-center gap-1.5">
                 <Icon name="Phone" size={14} />
